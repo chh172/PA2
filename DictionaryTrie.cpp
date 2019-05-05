@@ -5,6 +5,7 @@
 /* Create a new Dictionary that uses a Trie back end */
 DictionaryTrie::DictionaryTrie() {
   root = new TrieNode();
+  numCmp = 0;
 }
 
 /**
@@ -155,6 +156,7 @@ std::pair<bool,TrieNode *> DictionaryTrie::containFrom(std::string word, TrieNod
 std::vector<std::string> DictionaryTrie::predictCompletions(std::string prefix
                                               , unsigned int num_completions) {
   // case prefix not in dictionary
+  numCmp = num_completions;
   while (!v.empty()) {
     v.pop();
   }
@@ -173,9 +175,9 @@ std::vector<std::string> DictionaryTrie::predictCompletions(std::string prefix
 
   vector<string> ret;
   long unsigned int numComp = (long unsigned int) num_completions;
-  long unsigned int ogSize = v.size();
+  long unsigned int ogSize = v.size(); // in fact they coincide.
   for (long unsigned int i = 0; i < numComp && i < ogSize; i++) {
-    ret.push_back(std::get<0>(v.top()));
+    ret.insert(ret.begin(),v.top().first);
     v.pop();
   }
   return ret;
@@ -189,6 +191,9 @@ void DictionaryTrie::completeFrom(TrieNode * n, string s) {
    // completeFrom(n->left,temp);
     if (n->isEndofWord) {
       v.push(std::pair<std::string,TrieNode *>(s,n));
+      if (v.size() > numCmp) {
+        v.pop();
+      }
     }
     completeFrom(n->mid,s);
     completeFrom(n->left,temp);

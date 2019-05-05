@@ -70,6 +70,7 @@ public:
 private:
   // Add your own data members and methods here
   TrieNode * root;
+  unsigned int numCmp;
   struct Priority {
     bool operator() (std::pair<std::string,TrieNode *> p1
                                     , std::pair<std::string,TrieNode *> p2) {
@@ -81,8 +82,19 @@ private:
       }
     }
   };
+  struct PriorityOpt {
+    bool operator() (std::pair<std::string,TrieNode *> p1
+                                    , std::pair<std::string,TrieNode *> p2) {
+      if (std::get<1>(p1)->freq != std::get<1>(p2)->freq) {
+        return (std::get<1>(p1))->freq > (std::get<1>(p2))->freq;
+      }
+      else {
+        return (std::get<0>(p1)).compare((std::get<0>(p2))) < 0;
+      }
+    }
+  };
   priority_queue<std::pair<std::string,TrieNode *>
-                    , vector<std::pair<string,TrieNode *>>,Priority> v;
+                    , vector<std::pair<string,TrieNode *>>,PriorityOpt> v;
   priority_queue<std::pair<std::string,TrieNode *>
                     , vector<std::pair<string,TrieNode *>>,Priority> v2;
   vector<std::pair<string,TrieNode *>> v3;
