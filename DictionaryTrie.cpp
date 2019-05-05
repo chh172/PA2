@@ -155,11 +155,9 @@ std::pair<bool,TrieNode *> DictionaryTrie::containFrom(std::string word, TrieNod
 std::vector<std::string> DictionaryTrie::predictCompletions(std::string prefix
                                               , unsigned int num_completions) {
   // case prefix not in dictionary
-  /*
   while (!v.empty()) {
     v.pop();
   }
-  */
   TrieNode * curr = std::get<1>(containFrom(prefix,root));
   if (curr == nullptr) {
     return {};
