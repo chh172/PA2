@@ -1,3 +1,10 @@
+/**
+ *  FileHeader:
+ *  FileName: TrieNode.hpp
+ *  Description: this file contains a class that construct the node in our Trie
+ *  Authors: Chuhuan Huang, Junyi Wu 
+ *  source of help: discussion slides. Tutors. Writeup
+ */
 #ifndef TrieNode_hpp
 #define TrieNode_hpp
 
@@ -25,7 +32,7 @@ public:
   }
   /** constructor with information */
   TrieNode(const char data, bool isEndofWord)
-  : data(data), isEndofWord(isEndofWord) {
+  : isEndofWord(isEndofWord), data(data) {
     left = mid = right = nullptr;
     freq = 0;
     maxBelow = 0;

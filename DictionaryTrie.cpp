@@ -1,8 +1,12 @@
 /**
- *  CSE 100 PA2 C++ Autocomplete
- *  Authors: Jor-el Briones, Christine Alvarado
+ *  FileHeader:
+ *  FileName: DictionaryTrie.cpp
+ *  Description: this file constructs our Dictionary Trie and its functionality
+ *  inplementations of the hpp counterpart.
+ *  Authors: Chuhuan Huang, Junyi Wu
  *  source of help: discussion slides. Tutors. Writeup
  */
+
 #include "DictionaryTrie.hpp"
 #include "TrieNode.hpp"
 #include <algorithm>
@@ -44,7 +48,7 @@ bool DictionaryTrie::insert(std::string word, unsigned int freq) {
     return true;
   }
 }
-
+/** recursive helper of insert */
 void DictionaryTrie::insertTo(std::string word, unsigned int freq
                                                     , TrieNode * node) {
 
@@ -85,23 +89,24 @@ void DictionaryTrie::insertTo(std::string word, unsigned int freq
     }
     else { // append at this node
       node->right = new TrieNode(word[0],false);
-      //wordToNodes(word,freq,node);
       wordToNodes(word.substr(1,word.length()-1),freq,node->right);
     }
   }
 }
+/** helper to update maxBelow */
 void DictionaryTrie::updateMaxBelow(TrieNode * node, unsigned int freq) {
   if (node->maxBelow < freq) {
     node->maxBelow = freq;
   }
 }
-void DictionaryTrie::wordToNodes(std::string word, unsigned int freq, TrieNode * n) {
+/** helper to assemble the nodes to form a word */
+void DictionaryTrie::wordToNodes(std::string word
+                                  ,unsigned int freq,TrieNode * n) {
   TrieNode * traverse = n;
   while (!word.empty()) {
     traverse->mid = new TrieNode(word[0],false);
     updateMaxBelow(traverse,freq);
     traverse = traverse->mid;
-    //traverse->maxBelow = freq;
     word = word.substr(1,word.length()-1);
   }
   updateMaxBelow(traverse,freq);
@@ -112,6 +117,7 @@ void DictionaryTrie::wordToNodes(std::string word, unsigned int freq, TrieNode *
 bool DictionaryTrie::find(std::string word) const {
   return findFrom(word,root);
 }
+/** recursive helper of find */
 bool DictionaryTrie::findFrom(std::string word, TrieNode * node) const {
   if (node == nullptr) {
     return false;
@@ -204,7 +210,8 @@ std::vector<std::string> DictionaryTrie::predictCompletions(std::string prefix
   return ret;
 }
 /** dfs helper returns second maxBelow */
-unsigned int DictionaryTrie::completeFrom(TrieNode * n, string s, unsigned int target) {
+unsigned int DictionaryTrie::completeFrom(TrieNode * n
+                                          , string s, unsigned int target) {
   unsigned int secondBest = 0;
   if (n == nullptr) {
     return secondBest;
@@ -270,7 +277,8 @@ std::vector<std::string> DictionaryTrie::predictUnderscore(std::string pattern
   else { // underscore in middle and front
     clean();
     string prefix(pattern.substr(0,pattern.find('_')));
-    string post(pattern.substr(pattern.find('_',0)+1,pattern.length() - prefix.length()));
+    string post(pattern.substr(pattern.find('_',0)+1
+                          ,pattern.length() - prefix.length()));
     TrieNode * traverse = root;
     if (!prefix.empty()) {
       TrieNode * curr = (containFrom(prefix,root)).second;
@@ -284,13 +292,16 @@ std::vector<std::string> DictionaryTrie::predictUnderscore(std::string pattern
     for (size_t i = 0; i < v3.size(); i++) {
       string copy(v3[i].first);
       string copyPrefix(prefix);
-      v2.push(std::pair<std::string,TrieNode *>(copyPrefix.append(copy.append(post)),v3[i].second));
+      v2.push(pair<string,TrieNode *>(copyPrefix.append(copy.append(post))
+                                                              ,v3[i].second));
       // need that end Node pointer to have freq.
     }
     return copyPQ(num_completions);
   }
 }
-void DictionaryTrie::traverseBelowForEpi(string post, TrieNode * traverse, int flag) {
+/** recursive helper to assemble to string for return*/
+void DictionaryTrie::traverseBelowForEpi(string post
+                                      , TrieNode * traverse, int flag) {
   if (flag == 1) {
     if (traverse == nullptr) {
       return;
@@ -345,6 +356,7 @@ TrieNode * DictionaryTrie::matchFrom(std::string word, TrieNode * node) const {
     }
   }
 }
+/** helper to find all unit-length word */
 void DictionaryTrie::assembleUnitLengthList(TrieNode * node) {
   if (node == nullptr) {
     return;
@@ -356,12 +368,14 @@ void DictionaryTrie::assembleUnitLengthList(TrieNode * node) {
   assembleUnitLengthList(node->right);
   assembleUnitLengthList(node->left);
 }
+/** helper to clean the PQs */
 void DictionaryTrie::clean() {
   while (!v2.empty()) {
     v2.pop();
   }
   v3.clear();
 }
+/** helper to copy PQs */
 vector<string> DictionaryTrie::copyPQ(unsigned int num_completions) {
   vector<string> ret;
   long unsigned int numComp = (long unsigned int) num_completions;
@@ -376,6 +390,7 @@ vector<string> DictionaryTrie::copyPQ(unsigned int num_completions) {
 DictionaryTrie::~DictionaryTrie() {
   deleteAll(root);
 }
+/** Destructor helper */
 void DictionaryTrie::deleteAll(TrieNode * n) {
   /* Pseudo Code:
   if current node is null: return;

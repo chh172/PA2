@@ -1,6 +1,9 @@
 /**
- *  CSE 100 PA2 C++ Autocomplete
- *  Authors: Jor-el Briones, Christine Alvarado
+ *  FileHeader:
+ *  FileName: DictionaryTrie.hpp
+ *  Description: this file constructs our Dictionary Trie and its functionality
+ *  Authors: Chuhuan Huang, Junyi Wu
+ *  source of help: discussion slides. Tutors. Writeup
  */
 
 #ifndef DICTIONARY_TRIE_HPP
@@ -70,7 +73,9 @@ public:
 private:
   // Add your own data members and methods here
   TrieNode * root;
+  // root of Trie
   unsigned int numCmp;
+  // num of completion
   struct Priority {
     bool operator() (std::pair<std::string,TrieNode *> p1
                                     , std::pair<std::string,TrieNode *> p2) {
@@ -81,7 +86,7 @@ private:
         return (std::get<0>(p1)).compare((std::get<0>(p2))) > 0;
       }
     }
-  };
+  }; // comparator 1
   struct PriorityOpt {
     bool operator() (std::pair<std::string,TrieNode *> p1
                                     , std::pair<std::string,TrieNode *> p2) {
@@ -92,11 +97,13 @@ private:
         return (std::get<0>(p1)).compare((std::get<0>(p2))) < 0;
       }
     }
-  };
+  };// comparator 2
   priority_queue<std::pair<std::string,TrieNode *>
                     , vector<std::pair<string,TrieNode *>>,PriorityOpt> v;
+  // PQ used in completion
   priority_queue<std::pair<std::string,TrieNode *>
                     , vector<std::pair<string,TrieNode *>>,Priority> v2;
+  // PQ used in underscore
   vector<std::pair<string,TrieNode *>> v3;
   struct Cpriority {
     bool operator() (unsigned int p1, unsigned int p2) {
@@ -104,18 +111,30 @@ private:
     }
   };
   priority_queue<unsigned int, std::vector<unsigned int>, Cpriority> criteria;
+
+  /** recursive helper of find */
   bool findFrom(std::string word, TrieNode * node) const;
+  /** recursive helper of insert */
   void insertTo(std::string word, unsigned int freq, TrieNode * node);
+  /** helper to assemble the nodes to form a word */
   void wordToNodes(std::string word, unsigned int freq, TrieNode * n);
+  /** Destructor helper */
   void deleteAll(TrieNode * n);
+  /** dfs recursive helper for predictCompletions that returns second maxBelow*/
   unsigned int completeFrom(TrieNode * n, string s, unsigned int target);
+  /** recursive helper to search given prefix, return the node* of last char */
   pair<bool,TrieNode *> containFrom(std::string word,TrieNode * node) const;
-  //TrieNode * findPatternFrom(std::string pattern, TrieNode * node) const;
+  /** recursive helper to determine if the post underscore part match */
   TrieNode * matchFrom(std::string word,TrieNode * node) const;
+  /** helper to clean the PQs */
   void clean();
+  /** helper to copy PQs */
   vector<string> copyPQ(unsigned int num_completions);
+  /** helper to find all unit-length word */
   void assembleUnitLengthList(TrieNode * node);
+  /** recursive helper to assemble to string for return*/
   void traverseBelowForEpi(string post, TrieNode * traverse, int flag);
+  /** helper to update maxBelow */
   void updateMaxBelow(TrieNode * node, unsigned int freq);
 };
 

@@ -42,17 +42,18 @@ int main(int argc, char** argv)
     getline(cin, inputPattern);
 
     //get number of completions and convert to int
-    string completion;
+    unsigned int completion;
     cout << "Enter a number of completions:" << endl;
-    getline(cin, completion);
-    unsigned int com = (unsigned int) (stoi(completion, nullptr));
+    cin >> completion;
+    cin.ignore();
+    //unsigned int com = (unsigned int) (stoi(completion, nullptr));
     vector<string> result;
     if (inputPattern.find('_') == std::string::npos) {
       //get the result from predictCompletions
-      result = dic.predictCompletions(inputPattern, com);
+      result = dic.predictCompletions(inputPattern, completion);
     }
     else {
-      result = dic.predictUnderscore(inputPattern, com);
+      result = dic.predictUnderscore(inputPattern, completion);
     }
 
     for (unsigned int i = 0;  i< result.size();i++){
