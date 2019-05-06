@@ -177,13 +177,16 @@ std::vector<std::string> DictionaryTrie::predictCompletions(std::string prefix
   }
   // case prefix in dictionary
   //string record(prefix);
-  if (curr->freq >= curr->maxBelow) {
+  if (curr->isEndofWord) {
     v.push(std::pair<std::string,TrieNode *>(prefix,curr));
   }
   if (curr->mid != nullptr) {
     unsigned int record = curr->mid->maxBelow;
     while (v.size() < (long unsigned int) num_completions && record != 0) {
       record = completeFrom(curr->mid,prefix,record);
+      if (record > v.top().second->freq) {
+        v.pop();
+      }
     }
   }
 
@@ -201,7 +204,7 @@ unsigned int DictionaryTrie::completeFrom(TrieNode * n, string s, unsigned int t
   if (n == nullptr) {
     return secondBest;
   }
-  if (n != nullptr) {
+  //if (n != nullptr) {
     if (n->maxBelow < target) {
       secondBest = n->maxBelow;
     }
@@ -225,7 +228,7 @@ unsigned int DictionaryTrie::completeFrom(TrieNode * n, string s, unsigned int t
       ,completeFrom(n->left,temp,target)),completeFrom(n->right,temp,target));
     secondBest = max(secondBest,tep);
     return secondBest;
-  }
+  //}
 }
 /* Return up to num_completions of the most frequent completions
  * of the pattern, such that the completions are words in the dictionary.
