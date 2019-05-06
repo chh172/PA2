@@ -177,7 +177,7 @@ std::vector<std::string> DictionaryTrie::predictCompletions(std::string prefix
   }
   // case prefix in dictionary
   //string record(prefix);
-  if (curr->isEndofWord) {
+  if (curr->freq >= curr->maxBelow) {
     v.push(std::pair<std::string,TrieNode *>(prefix,curr));
   }
   if (curr->mid != nullptr) {
