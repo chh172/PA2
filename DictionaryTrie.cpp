@@ -1,3 +1,8 @@
+/**
+ *  CSE 100 PA2 C++ Autocomplete
+ *  Authors: Jor-el Briones, Christine Alvarado
+ *  source of help: discussion slides. Tutors. Writeup
+ */
 #include "DictionaryTrie.hpp"
 #include "TrieNode.hpp"
 #include <algorithm>
