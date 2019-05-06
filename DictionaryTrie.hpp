@@ -98,11 +98,17 @@ private:
   priority_queue<std::pair<std::string,TrieNode *>
                     , vector<std::pair<string,TrieNode *>>,Priority> v2;
   vector<std::pair<string,TrieNode *>> v3;
+  struct Cpriority {
+    bool operator() (unsigned int p1, unsigned int p2) {
+      return p1 < p2;
+    }
+  };
+  priority_queue<unsigned int, std::vector<unsigned int>, Cpriority> criteria;
   bool findFrom(std::string word, TrieNode * node) const;
   void insertTo(std::string word, unsigned int freq, TrieNode * node);
   void wordToNodes(std::string word, unsigned int freq, TrieNode * n);
   void deleteAll(TrieNode * n);
-  void completeFrom(TrieNode * n, string s);
+  unsigned int completeFrom(TrieNode * n, string s, unsigned int target);
   pair<bool,TrieNode *> containFrom(std::string word,TrieNode * node) const;
   //TrieNode * findPatternFrom(std::string pattern, TrieNode * node) const;
   TrieNode * matchFrom(std::string word,TrieNode * node) const;
@@ -110,6 +116,7 @@ private:
   vector<string> copyPQ(unsigned int num_completions);
   void assembleUnitLengthList(TrieNode * node);
   void traverseBelowForEpi(string post, TrieNode * traverse, int flag);
+  void updateMaxBelow(TrieNode * node, unsigned int freq);
 };
 
 #endif // DICTIONARY_TRIE_H

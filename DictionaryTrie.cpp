@@ -24,6 +24,11 @@ bool DictionaryTrie::insert(std::string word, unsigned int freq) {
   if (root->data == '\0') {
     root->data = word[0];
     wordToNodes(word.substr(1,word.length()-1),freq,root);
+    TrieNode * traverse = root;
+    while (traverse != nullptr) {
+      updateMaxBelow(traverse,freq);
+      traverse = traverse->mid;
+    }
     return true;
   }
   if (find(word)) {
@@ -37,17 +42,20 @@ bool DictionaryTrie::insert(std::string word, unsigned int freq) {
 
 void DictionaryTrie::insertTo(std::string word, unsigned int freq
                                                     , TrieNode * node) {
+
   if (word.empty()) {
     return;
   }
   if (node == nullptr) {
     return;
   }
+  updateMaxBelow(node,freq);
   if (word[0] == node->data) {
     if (node->mid != nullptr) {
       if (word.length() == 1) {
         node->isEndofWord = true;
         node->freq = freq;
+        node->maxBelow = max(node->maxBelow,freq);
       }
       else {
         insertTo(word.substr(1,word.length()-1),freq,node->mid);
@@ -77,14 +85,21 @@ void DictionaryTrie::insertTo(std::string word, unsigned int freq
     }
   }
 }
-
- void DictionaryTrie::wordToNodes(std::string word, unsigned int freq, TrieNode * n) {
+void DictionaryTrie::updateMaxBelow(TrieNode * node, unsigned int freq) {
+  if (node->maxBelow < freq) {
+    node->maxBelow = freq;
+  }
+}
+void DictionaryTrie::wordToNodes(std::string word, unsigned int freq, TrieNode * n) {
   TrieNode * traverse = n;
   while (!word.empty()) {
     traverse->mid = new TrieNode(word[0],false);
+    updateMaxBelow(traverse,freq);
     traverse = traverse->mid;
+    //traverse->maxBelow = freq;
     word = word.substr(1,word.length()-1);
   }
+  updateMaxBelow(traverse,freq);
   traverse->isEndofWord = true;
   traverse->freq = freq;
 }
@@ -114,11 +129,7 @@ bool DictionaryTrie::findFrom(std::string word, TrieNode * node) const {
     }
   }
 }
-/*
-bool DictionaryTrie::contain(std::string word) const {
-  return containFrom(word,root);
-}
-*/
+
 /** return a pair that contains information:
   * 1. if prefix contained in TST
   * 2. the pointer to node that corresponds to the last char of prefix.
@@ -155,49 +166,65 @@ std::pair<bool,TrieNode *> DictionaryTrie::containFrom(std::string word, TrieNod
  */
 std::vector<std::string> DictionaryTrie::predictCompletions(std::string prefix
                                               , unsigned int num_completions) {
-  // case prefix not in dictionary
   numCmp = num_completions;
   while (!v.empty()) {
     v.pop();
   }
+  // case prefix not in dictionary
   TrieNode * curr = std::get<1>(containFrom(prefix,root));
   if (curr == nullptr) {
     return {};
   }
   // case prefix in dictionary
-  string record(prefix);
+  //string record(prefix);
   if (curr->isEndofWord) {
     v.push(std::pair<std::string,TrieNode *>(prefix,curr));
   }
   if (curr->mid != nullptr) {
-    completeFrom(curr->mid,prefix);
+    unsigned int record = curr->mid->maxBelow;
+    while (v.size() < (long unsigned int) num_completions && record != 0) {
+      record = completeFrom(curr->mid,prefix,record);
+    }
   }
 
   vector<string> ret;
-  long unsigned int numComp = (long unsigned int) num_completions;
-  long unsigned int ogSize = v.size(); // in fact they coincide.
-  for (long unsigned int i = 0; i < numComp && i < ogSize; i++) {
-    ret.insert(ret.begin(),v.top().first);
+  while(v.size() != 0) {
+    ret.insert(ret.begin(), v.top().first);
     v.pop();
   }
+
   return ret;
 }
-void DictionaryTrie::completeFrom(TrieNode * n, string s) {
-
+/** dfs helper returns second maxBelow */
+unsigned int DictionaryTrie::completeFrom(TrieNode * n, string s, unsigned int target) {
+  unsigned int secondBest = 0;
+  if (n == nullptr) {
+    return secondBest;
+  }
   if (n != nullptr) {
+    if (n->maxBelow < target) {
+      secondBest = n->maxBelow;
+    }
+    if (n->freq < target && n->freq > secondBest) {
+      secondBest = n->freq;
+    }
+    if (n->maxBelow < target) {
+      return secondBest;
+    }
     string temp(s);
     //completeFrom(n->left,temp);
     s.push_back(n->data);
    // completeFrom(n->left,temp);
-    if (n->isEndofWord) {
+    if (n->freq == target) {
       v.push(std::pair<std::string,TrieNode *>(s,n));
       if (v.size() > numCmp) {
         v.pop();
       }
     }
-    completeFrom(n->mid,s);
-    completeFrom(n->left,temp);
-    completeFrom(n->right,temp);
+    unsigned int tep = max(max(completeFrom(n->mid,s,target)
+      ,completeFrom(n->left,temp,target)),completeFrom(n->right,temp,target));
+    secondBest = max(secondBest,tep);
+    return secondBest;
   }
 }
 /* Return up to num_completions of the most frequent completions
@@ -213,6 +240,7 @@ void DictionaryTrie::completeFrom(TrieNode * n, string s) {
 
 std::vector<std::string> DictionaryTrie::predictUnderscore(std::string pattern
                                               , unsigned int num_completions) {
+
   if (pattern.length() == 1) {
     // complete with one-length word
     clean();

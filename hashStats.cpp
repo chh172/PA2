@@ -21,12 +21,30 @@ unsigned int numElem = 0;
 
 /** The hash function that we are testing for collisions */
 unsigned int hashFunc(const std::string & item) {
-    // TODO: add the hash function you found here
+//RSHash https://www.programmingalgor
+//ithms.com/algorithm/rs-hash?lang=C%2B%2B
+   std::hash<std::string> hash_fn;
+   unsigned int hashVal = hash_fn(item);
+
+   for(unsigned int i = 0; i<item.length();  i++)
+     hashVal = 37*hashVal+item[i];
+
+   return hashVal;
+
 }
 
 /** Returns the number of collisions in the hash table */
 unsigned int countCollision() {
-    // TODO: Count the number of collisions in the pseudo hash table
+    // : Count the number of collisions in the pseudo hash table
+    unsigned int count =0;
+
+    //for every entry of the table larger than 1, increment the total count
+    for(unsigned int i = 0; i<table.size();i++){
+	if(table[i]>1){
+	    count=count+table[i]-1;
+	}	
+    }
+    return count;
 }
 
 /** When load factor is high, rehash all the inserted items */

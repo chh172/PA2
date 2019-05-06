@@ -14,12 +14,13 @@ public:
   bool isEndofWord;
   char data;
   unsigned int freq;
-
+  unsigned int maxBelow;
   /** Default constructor */
   TrieNode() {
     left = mid = right = nullptr;
     isEndofWord = false;
     freq = 0;
+    maxBelow = 0;
     data = (char) 0;
   }
   /** constructor with information */
@@ -27,6 +28,7 @@ public:
   : data(data), isEndofWord(isEndofWord) {
     left = mid = right = nullptr;
     freq = 0;
+    maxBelow = 0;
     if (isEndofWord) {
       freq = 1;
     }

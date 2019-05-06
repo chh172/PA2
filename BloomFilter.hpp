@@ -31,8 +31,16 @@ private:
     // The char array as the hash table
     unsigned char* table;
     unsigned int numSlots;
+    // the helper methods for insert and find 
+    void setter(unsigned int idx);
+    bool getter(unsigned int idx);
+
+    //the three hashfunctions
+    unsigned int hashFunc1(string  item);
+    unsigned int hashFunc2(string  item);
+    unsigned int hashFunc3(string  item);
+
     
-    // TODO: Add your own data and method here
 
 };
 #endif // BLOOM_FILTER
