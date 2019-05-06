@@ -184,7 +184,7 @@ std::vector<std::string> DictionaryTrie::predictCompletions(std::string prefix
     unsigned int record = curr->mid->maxBelow;
     while (v.size() < (long unsigned int) num_completions && record != 0) {
       record = completeFrom(curr->mid,prefix,record);
-      if (record > v.top().second->freq) {
+      if (v.size() == (long unsigned int) num_completions && record > v.top().second->freq) {
         v.pop();
       }
     }
